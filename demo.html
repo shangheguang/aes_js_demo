@@ -1,0 +1,72 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+<body>
+    <script src="./js/jquery-1.11.1.min.js?v=1.0" type="text/javascript"></script>
+    <script src="./js/aes.js?v=1.1" type="text/javascript"></script>
+    <script src="./js/mode-ecb.js?v=1.0" type="text/javascript"></script>
+
+<script>
+
+//VUE 的话引入  https://github.com/sytelus/CryptoJS
+
+/**
+ * AES加密
+ */
+function aesEncrypt(str, key) 
+{
+    var key = CryptoJS.enc.Utf8.parse(key);
+    var str = CryptoJS.enc.Utf8.parse(str);
+    var encrypted = CryptoJS.AES.encrypt(str, key, {mode: CryptoJS.mode.ECB});
+    return encrypted.toString();
+}
+
+/**
+ * AES解密
+ */
+function aesDecrypt(str, key)
+{  
+    var str = decodeURIComponent(str);
+    var key = CryptoJS.enc.Utf8.parse(key);
+    var decrypt = CryptoJS.AES.decrypt(str, key, {mode:CryptoJS.mode.ECB});
+    return CryptoJS.enc.Utf8.stringify(decrypt).toString();
+}  
+
+/**
+ * 随机字符串
+ */
+function randomString(len) 
+{
+　　len = len || 32;
+　　var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+　　var maxPos = $chars.length;
+　　var pwd = '';
+　　for (i = 0; i < len; i++) {
+　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+　　}
+　　return pwd;
+}
+
+var apihost  =   'http://api.domain.com';
+var appid    =   ''; //appid   
+var key      =   ''; //key
+var time     =   Date.parse(new Date()); //当前时间戳
+var json     =   {hash_doctor_id:1};
+var data     =   aesEncrypt(JSON.stringify(json), key); 
+var noncestr =   randomString(6);
+var version  =   '1.0';
+var os       =   'H5';
+
+$.post(apihost+'/controller/action?appid='+appid+'&os='+os+'&time='+time+'&version='+version+'&noncestr='+noncestr, {'data':encodeURIComponent(data)}, function(result) {
+
+    alert(aesDecrypt(result.data, key)); 
+    // console.log(aesDecrypt(result.data, key));  
+
+}); 
+
+
+</script>
+
+
+</body>
+</html>
